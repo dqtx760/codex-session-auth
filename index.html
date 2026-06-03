@@ -195,6 +195,148 @@
     display: none;
   }
   .err.show { display: block; }
+  /* === Password Gate === */
+  body.gated .wrap {
+    filter: blur(6px);
+    pointer-events: none;
+    user-select: none;
+  }
+  .gate-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(11, 13, 16, 0.55);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .gate-overlay.hidden { display: none; }
+  .gate-box {
+    max-width: 420px;
+    width: 100%;
+    padding: 40px 32px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    text-align: center;
+  }
+  .gate-box h2 {
+    margin: 0 0 8px;
+    font-size: 22px;
+    letter-spacing: -0.3px;
+  }
+  .gate-box .gate-sub {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 24px;
+  }
+  .gate-qr {
+    width: 180px;
+    height: 180px;
+    margin: 0 auto 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--panel-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .gate-qr img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .gate-qr .qr-placeholder {
+    color: var(--muted);
+    font-size: 13px;
+    padding: 16px;
+    text-align: center;
+    line-height: 1.5;
+  }
+  .gate-hint {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0 0 20px;
+    line-height: 1.6;
+  }
+  .gate-hint strong { color: var(--accent); }
+  .gate-getpwd {
+    display: inline-block;
+    margin: 12px 0 4px;
+    padding: 8px 20px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: inherit;
+  }
+  .gate-getpwd:hover { background: var(--accent-hover); }
+  .gate-input-row {
+    display: flex;
+    gap: 8px;
+  }
+  .gate-input {
+    flex: 1;
+    padding: 10px 14px;
+    background: var(--code-bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .gate-input:focus { border-color: var(--accent); }
+  .gate-input::placeholder { color: #555; }
+  .gate-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .gate-btn:hover { background: var(--accent-hover); }
+  .gate-err {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+    color: #fca5a5;
+    font-size: 12.5px;
+    display: none;
+  }
+  .gate-err.show { display: block; }
+  .gate-section { display: none; }
+  .gate-section.active { display: block; }
+  .gate-back {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 6px 14px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .gate-back:hover { color: var(--text); border-color: var(--text); }
+  /* === end gate === */
+
   .empty {
     color: var(--muted);
     font-size: 13px;
@@ -215,9 +357,70 @@
     font-size: 12px;
   }
   footer a { color: var(--muted); }
+  .links-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 32px;
+  }
+  .links-row .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 14px;
+    text-decoration: none;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .links-row .btn-ghost:hover {
+    background: var(--panel-2);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 </style>
 </head>
 <body>
+
+<!-- Password Gate Overlay -->
+<div class="gate-overlay" id="gate">
+  <div class="gate-box">
+    <h2>🔐 访问验证</h2>
+
+    <!-- Section 1: 密码输入（默认显示） -->
+    <div class="gate-section active" id="gateInput">
+      <p class="gate-sub">请输入密码以访问</p>
+      <div class="gate-input-row">
+        <input class="gate-input" id="pwdInput" type="password" placeholder="请输入密码" autocomplete="off">
+        <button class="gate-btn" id="pwdBtn">验证</button>
+      </div>
+      <div class="gate-err" id="pwdErr"></div>
+      <button class="gate-getpwd" id="getPwdBtn">👉 点此获取密码</button>
+    </div>
+
+    <!-- Section 2: 获取密码（点击后显示） -->
+    <div class="gate-section" id="gateQr">
+      <div class="gate-qr">
+        <img id="qrImg" src="qrcode.webp" alt="公众号二维码"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+        <div class="qr-placeholder" style="display:none">
+          📱<br>请将公众号二维码<br>放到网站根目录<br>命名为 <code class="inline">qrcode.webp</code>
+        </div>
+      </div>
+      <p class="gate-hint">
+        1. 扫描上方二维码，关注公众号<br>
+        2. 回复关键词 <strong>密码</strong><br>
+        3. 将收到的密码粘贴到下方输入框
+      </p>
+      <button class="gate-back" id="backToInput">← 返回输入密码</button>
+    </div>
+  </div>
+</div>
+
 <div class="wrap">
 
   <header>
@@ -278,12 +481,78 @@
     </div>
   </section>
 
+  <div class="links-row">
+    <a class="btn-ghost" href="https://chatgpt.com" target="_blank" rel="noopener">🌐 ChatGPT 官网</a>
+    <a class="btn-ghost" href="https://chatgpt.com/advanced-account-security" target="_blank" rel="noopener">⚙️ 高级账户设置</a>
+    <a class="btn-ghost" href="https://github.com/dqtx760" target="_blank" rel="noopener">💻 GitHub 主页</a>
+  </div>
+
   <footer>
     所有处理均在浏览器本地完成,不会上传任何数据。
   </footer>
 </div>
 
 <script>
+// ===== Password Gate =====
+// ⚠️ 请修改下面的值：
+// HASHED_PWD — 你的密码的 SHA-256 哈希值
+// 如何生成哈希：在浏览器控制台运行 sha256('你的密码')，或访问 https://emn178.github.io/online-tools/sha256.html
+// 示例密码 "codex2026" 的哈希: 3e69039eb2718d5b0706ead298a5d85873eb5af6d16dbb8d7205daf27502a91b
+const HASHED_PWD = '3e69039eb2718d5b0706ead298a5d85873eb5af6d16dbb8d7205daf27502a91b'; // 示例密码: codex2026。请修改为你自己的密码哈希
+
+async function sha256(msg) {
+  const buffer = new TextEncoder().encode(msg);
+  const hash = await crypto.subtle.digest('SHA-256', buffer);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function verifyPassword() {
+  const input = document.getElementById('pwdInput');
+  const errEl = document.getElementById('pwdErr');
+  const val = input.value.trim();
+  if (!val) {
+    errEl.textContent = '请输入密码';
+    errEl.classList.add('show');
+    return;
+  }
+  const hash = await sha256(val);
+  if (hash === HASHED_PWD) {
+    localStorage.setItem('auth_ok', '1');
+    document.getElementById('gate').classList.add('hidden');
+    document.body.classList.remove('gated');
+  } else {
+    errEl.textContent = '密码错误，请重新输入';
+    errEl.classList.add('show');
+    input.value = '';
+    input.focus();
+  }
+}
+
+document.getElementById('pwdBtn').addEventListener('click', verifyPassword);
+document.getElementById('pwdInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') verifyPassword();
+});
+
+// 切换到"获取密码"区域
+document.getElementById('getPwdBtn').addEventListener('click', function() {
+  document.getElementById('gateInput').classList.remove('active');
+  document.getElementById('gateQr').classList.add('active');
+  document.getElementById('pwdErr').classList.remove('show');
+});
+// 切回密码输入区域
+document.getElementById('backToInput').addEventListener('click', function() {
+  document.getElementById('gateQr').classList.remove('active');
+  document.getElementById('gateInput').classList.add('active');
+});
+
+// 检查是否已验证
+if (localStorage.getItem('auth_ok') === '1') {
+  document.getElementById('gate').classList.add('hidden');
+} else {
+  document.body.classList.add('gated');
+}
+
+// ===== Main App =====
 (function () {
   const input = document.getElementById('input');
   const output = document.getElementById('output');
