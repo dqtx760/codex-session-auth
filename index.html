@@ -296,6 +296,18 @@
   }
   .copy-btn:hover { color: var(--text); }
   .copy-btn.ok { color: var(--accent); border-color: var(--accent); }
+  .copy-btn.dl-btn {
+    margin-right: 6px;
+    background: rgba(16, 163, 127, 0.12);
+    border-color: rgba(16, 163, 127, 0.35);
+    color: #13bb91;
+    font-weight: 500;
+  }
+  .copy-btn.dl-btn:hover {
+    background: rgba(16, 163, 127, 0.22);
+    color: #fff;
+    border-color: rgba(16, 163, 127, 0.5);
+  }
   .row {
     display: flex;
     gap: 8px;
@@ -624,11 +636,15 @@
       <button class="tab" data-tab="linux">Linux Bash</button>
       <button class="tab" data-tab="macos">macOS Bash</button>
       <span class="tabs-spacer"></span>
-      <button class="copy-btn" id="copyBtn">复制</button>
+      <button class="copy-btn dl-btn" id="dlBtn" title="直接下载 auth.json 文件并放入 ~/.codex 目录">下载 auth.json</button>
+      <button class="copy-btn" id="copyBtn">复制命令</button>
     </div>
 
     <div class="code-box">
       <pre id="output"><span class="empty" style="display:block">先在上方粘贴 token,命令会自动生成</span></pre>
+    </div>
+    <div class="hint" style="margin-top:12px; background: rgba(16, 163, 127, 0.08); border-color: rgba(16, 163, 127, 0.25); color: #9fe3cf;">
+      💡 <strong>免命令方案</strong>：若终端执行遇到权限拦截或无法写入，可直接点击右上角<strong>「下载 auth.json」</strong>，将文件存放到 <code class="inline">~/.codex/</code> 目录下（Windows: <code class="inline">C:\Users\用户名\.codex\auth.json</code>）。
     </div>
   </section>
 
@@ -710,11 +726,12 @@ if (localStorage.getItem('auth_ok') === '1') {
   const output = document.getElementById('output');
   const err = document.getElementById('err');
   const copyBtn = document.getElementById('copyBtn');
+  const dlBtn = document.getElementById('dlBtn');
   const tabs = document.querySelectorAll('.tab');
 
   let currentPlatform = 'powershell';
   let currentCommand = '';
-
+  let currentAuthObj = null;
   function showErr(msg) {
     err.textContent = msg;
     err.classList.add('show');
@@ -828,9 +845,24 @@ if (localStorage.getItem('auth_ok') === '1') {
     };
   }
 
+  function toBase64Utf8(str) {
+    return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) =>
+      String.fromCharCode('0x' + p1)
+    ));
+  }
+
   function parseInput(raw) {
-    const text = raw.trim();
+    let text = raw.trim();
     if (!text) return null;
+
+    // 自动去除外层包裹的 Markdown 代码块或引号
+    if (text.startsWith('```')) {
+      text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+    }
+    // 自动去除 Bearer 前缀
+    if (text.startsWith('Bearer ') || text.startsWith('bearer ')) {
+      text = text.slice(7).trim();
+    }
 
     if (text.startsWith('{')) {
       let obj;
@@ -838,6 +870,16 @@ if (localStorage.getItem('auth_ok') === '1') {
         obj = JSON.parse(text);
       } catch (e) {
         throw new Error('JSON 解析失败: ' + e.message);
+      }
+
+      // 检查是否为未登录返回的空对象
+      if (Object.keys(obj).length === 0) {
+        throw new Error('获取到的 Session 为空 {}，说明当前浏览器尚未登录 ChatGPT。请在当前浏览器登录 ChatGPT 账号后，再点击上方按钮打开 Session 接口。');
+      }
+
+      if (obj.error) {
+        const msg = typeof obj.error === 'string' ? obj.error : JSON.stringify(obj.error);
+        throw new Error('ChatGPT 接口返回错误: ' + msg + '。请检查 ChatGPT 是否已正常登录。');
       }
 
       // 如果直接粘贴了已组装的 auth.json
@@ -850,7 +892,7 @@ if (localStorage.getItem('auth_ok') === '1') {
       let accToken = '';
       if (typeof obj.accessToken === 'string') accToken = obj.accessToken;
       else if (typeof obj.access_token === 'string') accToken = obj.access_token;
-      else throw new Error('JSON 中未找到 accessToken 字段，请粘贴完整的 ChatGPT Session JSON');
+      else throw new Error('JSON 中未找到 accessToken 字段，请确认是否已登录 ChatGPT，或重新复制完整的 Session JSON');
 
       return buildFromSession(obj, accToken);
     }
@@ -862,16 +904,16 @@ if (localStorage.getItem('auth_ok') === '1') {
 
     throw new Error('无法识别的输入。请粘贴 Session JSON 或 JWT 字符串。');
   }
+
   function genPowerShell(authObj) {
     const json = JSON.stringify(authObj, null, 2);
+    const b64 = toBase64Utf8(json);
     return `# Codex 凭证写入 (Windows PowerShell · 兼容 5.1 / 7+)
 $dir = Join-Path $HOME ".codex"
-New-Item -ItemType Directory -Force -Path $dir | Out-Null
-$json = @'
-${json}
-'@
-# 用 .NET API 强制写入无 BOM 的 UTF-8(PS 5.1 的 -Encoding UTF8 会带 BOM,导致 codex 报 "expected value at line 1 column 1")
-[System.IO.File]::WriteAllText((Join-Path $dir "auth.json"), $json, (New-Object System.Text.UTF8Encoding $false))`;
+if (!(Test-Path $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
+[System.IO.File]::WriteAllBytes((Join-Path $dir "auth.json"), [System.Convert]::FromBase64String("${b64}"))
+Write-Host "[OK] Codex 凭证已成功写入 ~/.codex/auth.json" -ForegroundColor Green
+if (Get-Command codex -ErrorAction SilentlyContinue) { codex login status }`;
   }
 
   function genBash(authObj, comment) {
@@ -881,7 +923,8 @@ mkdir -p ~/.codex
 cat > ~/.codex/auth.json <<'EOF'
 ${json}
 EOF
-echo "[OK] 已写入 ~/.codex/auth.json"`;
+echo "[OK] 已写入 ~/.codex/auth.json"
+if command -v codex >/dev/null 2>&1; then codex login status; fi`;
   }
 
   function render() {
@@ -890,6 +933,7 @@ echo "[OK] 已写入 ~/.codex/auth.json"`;
     if (!raw.trim()) {
       output.innerHTML = '<span class="empty" style="display:block">先在上方粘贴 token,命令会自动生成</span>';
       currentCommand = '';
+      currentAuthObj = null;
       return;
     }
 
@@ -900,15 +944,18 @@ echo "[OK] 已写入 ~/.codex/auth.json"`;
       showErr(e.message);
       output.innerHTML = '<span class="empty" style="display:block">解析失败,请检查输入</span>';
       currentCommand = '';
+      currentAuthObj = null;
       return;
     }
 
     if (!authObj) {
       output.innerHTML = '<span class="empty" style="display:block">未找到 token</span>';
       currentCommand = '';
+      currentAuthObj = null;
       return;
     }
 
+    currentAuthObj = authObj;
     let cmd;
     if (currentPlatform === 'powershell') cmd = genPowerShell(authObj);
     else if (currentPlatform === 'linux') cmd = genBash(authObj, 'Codex 凭证写入 (Linux Bash)');
@@ -929,14 +976,36 @@ echo "[OK] 已写入 ~/.codex/auth.json"`;
     });
   });
 
+  dlBtn.addEventListener('click', () => {
+    if (!currentAuthObj) {
+      showErr('请先在上方粘贴有效的 Session JSON 或 Token 才能下载');
+      return;
+    }
+    const json = JSON.stringify(currentAuthObj, null, 2);
+    const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'auth.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    dlBtn.textContent = '已下载';
+    setTimeout(() => { dlBtn.textContent = '下载 auth.json'; }, 1500);
+  });
+
   copyBtn.addEventListener('click', async () => {
-    if (!currentCommand) return;
+    if (!currentCommand) {
+      showErr('请先在上方输入框粘贴有效的 Session JSON 或 Token');
+      return;
+    }
     try {
       await navigator.clipboard.writeText(currentCommand);
       copyBtn.textContent = '已复制';
       copyBtn.classList.add('ok');
       setTimeout(() => {
-        copyBtn.textContent = '复制';
+        copyBtn.textContent = '复制命令';
         copyBtn.classList.remove('ok');
       }, 1500);
     } catch (e) {
@@ -949,7 +1018,7 @@ echo "[OK] 已写入 ~/.codex/auth.json"`;
       document.execCommand('copy');
       sel.removeAllRanges();
       copyBtn.textContent = '已复制';
-      setTimeout(() => { copyBtn.textContent = '复制'; }, 1500);
+      setTimeout(() => { copyBtn.textContent = '复制命令'; }, 1500);
     }
   });
 })();
