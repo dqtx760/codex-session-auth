@@ -6,22 +6,29 @@
 <title>Codex 免验证码登录 · Session Auth</title>
 <style>
   :root {
-    --bg: #0b0d10;
-    --panel: #14171c;
-    --panel-2: #1b1f26;
-    --border: #262b33;
-    --text: #e6e8eb;
-    --muted: #8b95a3;
-    --accent: #10a37f;
-    --accent-hover: #13bb91;
+    --bg: #07090e;
+    --panel: rgba(15, 19, 28, 0.75);
+    --panel-hover: rgba(20, 26, 38, 0.88);
+    --border: rgba(255, 255, 255, 0.08);
+    --border-subtle: rgba(255, 255, 255, 0.05);
+    --text: #f3f4f6;
+    --text-muted: #9ca3af;
+    --text-dim: #6b7280;
+    --accent: #b7f605;
+    --accent-hover: #c8ff1a;
+    --accent-glow: rgba(183, 246, 5, 0.25);
     --danger: #ef4444;
-    --warn: #f59e0b;
-    --code-bg: #0f1216;
+    --code-bg: #040508;
   }
   * { box-sizing: border-box; }
   html, body {
     margin: 0; padding: 0;
-    background: var(--bg);
+    background-color: #07090e;
+    background-image: 
+      radial-gradient(1200px circle at 50% -100px, rgba(183, 246, 5, 0.07) 0%, rgba(56, 189, 248, 0.02) 40%, transparent 75%),
+      linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    background-size: 100% 100%, 32px 32px, 32px 32px;
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
       "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
@@ -31,17 +38,17 @@
   .wrap {
     max-width: 880px;
     margin: 0 auto;
-    padding: 36px 24px 80px;
+    padding: 20px 24px 60px;
   }
   /* === Top Navbar === */
   .navbar {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(11, 13, 16, 0.78);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(7, 9, 14, 0.82);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
     width: 100%;
     transition: border-color 0.2s ease;
   }
@@ -49,7 +56,7 @@
     max-width: 880px;
     margin: 0 auto;
     padding: 0 24px;
-    height: 54px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -57,125 +64,105 @@
   .nav-brand {
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 10px;
     text-decoration: none;
     color: var(--text);
   }
-  .nav-brand:hover .nav-brand-name {
-    color: #fff;
-  }
   .nav-brand-logo {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     border-radius: 7px;
-    background: linear-gradient(135deg, #1f2530, #13171f);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, rgba(183, 246, 5, 0.2), rgba(0, 0, 0, 0.6));
+    border: 1px solid rgba(183, 246, 5, 0.35);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #10a37f;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    color: #b7f605;
+    box-shadow: 0 0 14px rgba(183, 246, 5, 0.18);
   }
-  .nav-brand-name {
+  .nav-brand-title {
     font-size: 15px;
     font-weight: 600;
-    letter-spacing: -0.2px;
-    color: var(--text);
-    transition: color 0.15s ease;
+    letter-spacing: -0.3px;
+    color: #ffffff;
   }
-  .nav-brand-sub {
-    color: var(--muted);
-    font-weight: 400;
-  }
-  .nav-badge {
+  .nav-brand-badge {
     font-size: 11px;
-    padding: 1px 7px;
+    padding: 2px 7px;
     border-radius: 20px;
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: var(--muted);
-    line-height: 1.4;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-weight: 500;
+    line-height: 1.3;
   }
   .nav-actions {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
   }
-  .nav-link {
+  .nav-status-badge {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    font-size: 13px;
-    color: var(--muted);
-    text-decoration: none;
-    padding: 5px 8px;
-    border-radius: 6px;
-    transition: color 0.15s ease, background 0.15s ease;
-  }
-  .nav-link:hover {
-    color: var(--text);
-    background: rgba(255, 255, 255, 0.05);
-  }
-  .nav-link-dimmed {
-    color: #8b95a3;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 4px 10px;
+    gap: 6px;
     font-size: 12px;
-    border-radius: 6px;
-    text-decoration: none;
+    color: var(--text-dim);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-subtle);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+  .nav-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #b7f605;
+    box-shadow: 0 0 8px #b7f605;
+  }
+  .nav-link-subtle {
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.02);
     transition: all 0.15s ease;
   }
-  .nav-link-dimmed:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.07);
-    border-color: rgba(255, 255, 255, 0.16);
-  }
-  .nav-icon-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--muted);
-    text-decoration: none;
-    padding: 5px;
-    border-radius: 6px;
-    transition: color 0.15s ease, background 0.15s ease;
-  }
-  .nav-icon-link:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.05);
+  .nav-link-subtle:hover {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
   }
   @media (max-width: 600px) {
     .nav-container {
       padding: 0 16px;
-      height: 50px;
+      height: 46px;
     }
-    .nav-badge {
+    .nav-status-badge {
       display: none;
     }
-    .nav-actions {
-      gap: 8px;
-    }
-  }
-  header {
-    margin-bottom: 24px;
-  }
-  header h1 {
-    font-size: 26px;
-    font-weight: 700;
-    margin: 0;
-    letter-spacing: -0.4px;
-    color: var(--text);
   }
   .step {
-    margin-top: 32px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px 22px;
+    margin-top: 20px;
+    background: linear-gradient(180deg, rgba(17, 22, 31, 0.78) 0%, rgba(10, 13, 19, 0.88) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .step:hover {
+    border-color: rgba(255, 255, 255, 0.13);
+    box-shadow: 0 12px 35px -8px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+  .step:first-of-type {
+    margin-top: 4px;
   }
   .step-head {
     display: flex;
@@ -184,129 +171,164 @@
     margin-bottom: 12px;
   }
   .step-num {
-    width: 26px; height: 26px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: #fff;
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(183, 246, 5, 0.16) 0%, rgba(183, 246, 5, 0.04) 100%);
+    border: 1px solid rgba(183, 246, 5, 0.35);
+    color: #b7f605;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    box-shadow: 0 0 14px rgba(183, 246, 5, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   }
   .step-title {
     font-size: 16px;
     font-weight: 600;
+    color: #f9fafb;
+    letter-spacing: -0.2px;
   }
   .step-desc {
-    color: var(--muted);
-    font-size: 13px;
-    margin: 0 0 14px;
+    color: var(--text-muted);
+    font-size: 13.5px;
+    margin: 0 0 16px;
+    line-height: 1.6;
   }
   .btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 9px 16px;
+    gap: 7px;
+    padding: 10px 20px;
     border-radius: 8px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
+    background: linear-gradient(180deg, #c7ff2e 0%, #b7f605 50%, #9ed600 100%);
+    color: #050608;
+    border: 1px solid rgba(255, 255, 255, 0.4);
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 13.5px;
+    font-weight: 600;
     text-decoration: none;
-    transition: background 0.15s;
+    box-shadow: 0 2px 14px rgba(183, 246, 5, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    letter-spacing: -0.1px;
+    transition: all 0.18s ease;
   }
-  .btn:hover { background: var(--accent-hover); }
+  .btn:hover {
+    background: linear-gradient(180deg, #d4ff4d 0%, #c4ff1a 50%, #aae500 100%);
+    box-shadow: 0 4px 22px rgba(183, 246, 5, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    transform: translateY(-1px);
+  }
+  .btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 6px rgba(183, 246, 5, 0.25);
+  }
   .btn-ghost {
     background: transparent;
     border: 1px solid var(--border);
     color: var(--text);
   }
-  .btn-ghost:hover { background: var(--panel-2); }
+  .btn-ghost:hover { background: rgba(255, 255, 255, 0.06); }
   textarea {
     width: 100%;
-    min-height: 140px;
-    padding: 12px;
+    min-height: 150px;
+    padding: 14px;
     background: var(--code-bg);
-    color: var(--text);
+    color: #e5e7eb;
     border: 1px solid var(--border);
-    border-radius: 8px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    border-radius: 10px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 12.5px;
+    line-height: 1.55;
     resize: vertical;
     outline: none;
-    transition: border-color 0.15s;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
-  textarea:focus { border-color: var(--accent); }
+  textarea:focus {
+    border-color: rgba(183, 246, 5, 0.55);
+    box-shadow: 0 0 0 3px rgba(183, 246, 5, 0.12), inset 0 1px 3px rgba(0, 0, 0, 0.4);
+  }
   .tabs {
     display: flex;
     align-items: center;
     gap: 4px;
     margin-bottom: 12px;
-    border-bottom: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--border-subtle);
+    padding: 4px;
+    border-radius: 8px;
   }
   .tabs-spacer { flex: 1; }
   .tab {
-    padding: 8px 14px;
+    padding: 6px 14px;
     background: transparent;
     border: none;
-    color: var(--muted);
+    color: var(--text-muted);
     cursor: pointer;
-    font-size: 13px;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
+    font-size: 12.5px;
+    border-radius: 6px;
     font-family: inherit;
+    transition: all 0.15s ease;
   }
   .tab.active {
-    color: var(--text);
-    border-bottom-color: var(--accent);
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
+    font-weight: 500;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   }
-  .tab:hover { color: var(--text); }
+  .tab:hover:not(.active) { color: var(--text); }
   .code-box {
     position: relative;
     background: var(--code-bg);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
   }
   .code-box pre {
     margin: 0;
     padding: 14px 16px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 12.5px;
-    color: #d4d8de;
+    color: #e2e8f0;
     overflow-x: auto;
     white-space: pre;
     max-height: 380px;
+    line-height: 1.5;
   }
   .copy-btn {
     padding: 5px 12px;
-    background: var(--panel-2);
-    border: 1px solid var(--border);
-    color: var(--muted);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #d1d5db;
     border-radius: 6px;
     cursor: pointer;
     font-size: 12px;
     font-family: inherit;
-    margin-bottom: 6px;
-    align-self: center;
+    transition: all 0.15s ease;
   }
-  .copy-btn:hover { color: var(--text); }
-  .copy-btn.ok { color: var(--accent); border-color: var(--accent); }
+  .copy-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  .copy-btn.ok {
+    background: rgba(183, 246, 5, 0.2);
+    color: #b7f605;
+    border-color: rgba(183, 246, 5, 0.45);
+  }
   .copy-btn.dl-btn {
     margin-right: 6px;
-    background: rgba(16, 163, 127, 0.12);
-    border-color: rgba(16, 163, 127, 0.35);
-    color: #13bb91;
+    background: rgba(183, 246, 5, 0.12);
+    border-color: rgba(183, 246, 5, 0.38);
+    color: #b7f605;
     font-weight: 500;
   }
   .copy-btn.dl-btn:hover {
-    background: rgba(16, 163, 127, 0.22);
+    background: rgba(183, 246, 5, 0.22);
     color: #fff;
-    border-color: rgba(16, 163, 127, 0.5);
+    border-color: rgba(183, 246, 5, 0.6);
   }
   .row {
     display: flex;
@@ -315,39 +337,50 @@
     margin-bottom: 10px;
   }
   .hint {
-    margin-top: 12px;
-    padding: 10px 12px;
-    background: rgba(245, 158, 11, 0.08);
-    border: 1px solid rgba(245, 158, 11, 0.25);
-    border-radius: 8px;
-    color: #fcd9a3;
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: rgba(183, 246, 5, 0.04);
+    border: 1px solid rgba(183, 246, 5, 0.2);
+    border-radius: 10px;
+    color: #e9fda3;
     font-size: 12.5px;
+    line-height: 1.6;
+  }
+  .hint code.inline {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(183, 246, 5, 0.28);
+    color: #b7f605;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 11.5px;
   }
   .quick-path-box {
     margin-top: 10px;
     padding-top: 10px;
-    border-top: 1px dashed rgba(16, 163, 127, 0.25);
+    border-top: 1px dashed rgba(183, 246, 5, 0.22);
   }
   .quick-path-tip {
     font-size: 12px;
-    color: #8be3cb;
+    color: #e9fda3;
     margin-bottom: 6px;
     display: block;
+    opacity: 0.9;
   }
   .quick-path-row {
     display: flex;
     align-items: center;
-    background: rgba(11, 13, 16, 0.65);
-    border: 1px solid rgba(16, 163, 127, 0.35);
-    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(183, 246, 5, 0.28);
+    border-radius: 8px;
     padding: 6px 10px;
     gap: 8px;
   }
   .quick-path-code {
     flex: 1;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: 13px;
-    color: #e6e8eb;
+    font-size: 12.5px;
+    color: #e5e7eb;
     user-select: all;
     overflow-x: auto;
     background: transparent;
@@ -358,10 +391,10 @@
     align-items: center;
     gap: 5px;
     padding: 4px 10px;
-    background: rgba(16, 163, 127, 0.18);
-    border: 1px solid rgba(16, 163, 127, 0.4);
-    color: #13bb91;
-    border-radius: 5px;
+    background: rgba(183, 246, 5, 0.16);
+    border: 1px solid rgba(183, 246, 5, 0.4);
+    color: #b7f605;
+    border-radius: 6px;
     font-size: 12px;
     font-weight: 500;
     cursor: pointer;
@@ -369,14 +402,15 @@
     transition: all 0.15s ease;
   }
   .quick-path-copy-btn:hover {
-    background: rgba(16, 163, 127, 0.3);
+    background: rgba(183, 246, 5, 0.26);
     color: #fff;
-    border-color: rgba(16, 163, 127, 0.6);
+    border-color: rgba(183, 246, 5, 0.6);
   }
   .quick-path-copy-btn.ok {
-    background: #10a37f;
-    color: #fff;
-    border-color: #10a37f;
+    background: #b7f605;
+    color: #000;
+    border-color: #b7f605;
+    font-weight: 600;
   }
   .err {
     margin-top: 10px;
@@ -462,11 +496,11 @@
     margin: 12px 0 4px;
     padding: 8px 20px;
     background: var(--accent);
-    color: #fff;
+    color: #000;
     border: none;
     border-radius: 8px;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     transition: background 0.15s;
     font-family: inherit;
@@ -489,16 +523,15 @@
     transition: border-color 0.15s;
   }
   .gate-input:focus { border-color: var(--accent); }
-  .gate-input::placeholder { color: #555; }
   .gate-btn {
     padding: 10px 20px;
     border-radius: 8px;
     background: var(--accent);
-    color: #fff;
+    color: #000;
     border: none;
     cursor: pointer;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     white-space: nowrap;
     transition: background 0.15s;
   }
@@ -539,9 +572,11 @@
     text-align: center;
   }
   code.inline {
-    background: var(--panel-2);
-    padding: 1px 6px;
-    border-radius: 4px;
+    background: rgba(183, 246, 5, 0.08);
+    border: 1px solid rgba(183, 246, 5, 0.22);
+    color: #b7f605;
+    padding: 2px 7px;
+    border-radius: 5px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 12px;
   }
@@ -550,32 +585,6 @@
     text-align: center;
     color: var(--muted);
     font-size: 12px;
-  }
-  footer a { color: var(--muted); }
-  .links-row {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 32px;
-  }
-  .links-row .btn-ghost {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 18px;
-    border-radius: 8px;
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-size: 14px;
-    text-decoration: none;
-    transition: background 0.15s, border-color 0.15s;
-  }
-  .links-row .btn-ghost:hover {
-    background: var(--panel-2);
-    border-color: var(--accent);
-    color: var(--accent);
   }
 </style>
 </head>
@@ -623,29 +632,23 @@
           <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
         </svg>
       </div>
-      <span class="nav-brand-name">Codex <span class="nav-brand-sub">Session Auth</span></span>
-      <span class="nav-badge">CLI Tool</span>
+      <span class="nav-brand-title">Codex 免验证码登录</span>
+      <span class="nav-brand-badge">Session Auth</span>
     </a>
     <div class="nav-actions">
-      <a class="nav-link" href="https://codex.afione.com/" target="_blank" rel="noopener">
-        <span>插件版</span>
-      </a>
-      <a class="nav-link-dimmed" href="https://wzyp.cn/shop/ZBT3W1E1" target="_blank" rel="noopener" title="ChatGPT 账户代充">
+      <div class="nav-status-badge">
+        <span class="nav-status-dot"></span>
+        <span>本地纯前端 · 数据不上传</span>
+      </div>
+      <a class="nav-link-subtle" href="https://wzyp.cn/shop/ZBT3W1E1" target="_blank" rel="noopener">
         <span>GPT代充</span>
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.75"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
-      </a>
-      <a class="nav-icon-link" href="https://github.com/dqtx760" target="_blank" rel="noopener" aria-label="GitHub">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.6"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
       </a>
     </div>
   </div>
 </nav>
 
 <div class="wrap">
-
-  <header>
-    <h1>Codex 免验证码登录</h1>
-  </header>
   <!-- Step 1 -->
   <section class="step">
     <div class="step-head">
@@ -698,12 +701,12 @@
     <div class="code-box">
       <pre id="output"><span class="empty" style="display:block">先在上方粘贴 token,命令会自动生成</span></pre>
     </div>
-    <div class="hint" style="margin-top:12px; background: rgba(16, 163, 127, 0.08); border-color: rgba(16, 163, 127, 0.25); color: #9fe3cf;">
+    <div class="hint" style="margin-top:14px; background: rgba(183, 246, 5, 0.04); border-color: rgba(183, 246, 5, 0.2); color: #e9fda3;">
       <div>
-        💡 <strong>免命令方案</strong>：若终端执行遇到权限拦截或无法写入，可直接点击右上角<strong>「下载 auth.json」</strong>，将文件存放到 <code class="inline">~/.codex/</code> 目录下（Windows: <code class="inline">C:\Users\用户名\.codex\auth.json</code>）。
+        💡 <strong>免命令方案</strong>：若终端执行遇到权限拦截或无法写入，可直接点击右上角<strong>「下载 auth.json」</strong>。
       </div>
       <div class="quick-path-box">
-        <span class="quick-path-tip">Windows 快速打开目录（按 Win+R 或在文件资源管理器地址栏粘贴）：</span>
+        <span class="quick-path-tip">按Win+R ：</span>
         <div class="quick-path-row">
           <code class="quick-path-code">%USERPROFILE%\.codex</code>
           <button class="quick-path-copy-btn" id="copyPathBtn" type="button" title="点击一键复制路径">
@@ -714,13 +717,6 @@
       </div>
     </div>
   </section>
-
-  <div class="links-row">
-    <a class="btn-ghost" href="https://chatgpt.com" target="_blank" rel="noopener">🌐 ChatGPT 官网</a>
-    <a class="btn-ghost" href="https://chatgpt.com/advanced-account-security" target="_blank" rel="noopener">⚙️ 高级账户设置</a>
-    <a class="btn-ghost" href="https://github.com/dqtx760" target="_blank" rel="noopener">💻 GitHub 主页</a>
-    <a class="btn-ghost" href="https://codex.afione.com/" target="_blank" rel="noopener">🧩 插件版</a>
-  </div>
 
   <footer>
     所有处理均在浏览器本地完成,不会上传任何数据。
