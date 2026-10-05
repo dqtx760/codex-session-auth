@@ -323,6 +323,61 @@
     color: #fcd9a3;
     font-size: 12.5px;
   }
+  .quick-path-box {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(16, 163, 127, 0.25);
+  }
+  .quick-path-tip {
+    font-size: 12px;
+    color: #8be3cb;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .quick-path-row {
+    display: flex;
+    align-items: center;
+    background: rgba(11, 13, 16, 0.65);
+    border: 1px solid rgba(16, 163, 127, 0.35);
+    border-radius: 6px;
+    padding: 6px 10px;
+    gap: 8px;
+  }
+  .quick-path-code {
+    flex: 1;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 13px;
+    color: #e6e8eb;
+    user-select: all;
+    overflow-x: auto;
+    background: transparent;
+    padding: 0;
+  }
+  .quick-path-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: rgba(16, 163, 127, 0.18);
+    border: 1px solid rgba(16, 163, 127, 0.4);
+    color: #13bb91;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+  }
+  .quick-path-copy-btn:hover {
+    background: rgba(16, 163, 127, 0.3);
+    color: #fff;
+    border-color: rgba(16, 163, 127, 0.6);
+  }
+  .quick-path-copy-btn.ok {
+    background: #10a37f;
+    color: #fff;
+    border-color: #10a37f;
+  }
   .err {
     margin-top: 10px;
     padding: 10px 12px;
@@ -644,7 +699,19 @@
       <pre id="output"><span class="empty" style="display:block">先在上方粘贴 token,命令会自动生成</span></pre>
     </div>
     <div class="hint" style="margin-top:12px; background: rgba(16, 163, 127, 0.08); border-color: rgba(16, 163, 127, 0.25); color: #9fe3cf;">
-      💡 <strong>免命令方案</strong>：若终端执行遇到权限拦截或无法写入，可直接点击右上角<strong>「下载 auth.json」</strong>，将文件存放到 <code class="inline">~/.codex/</code> 目录下（Windows: <code class="inline">C:\Users\用户名\.codex\auth.json</code>）。
+      <div>
+        💡 <strong>免命令方案</strong>：若终端执行遇到权限拦截或无法写入，可直接点击右上角<strong>「下载 auth.json」</strong>，将文件存放到 <code class="inline">~/.codex/</code> 目录下（Windows: <code class="inline">C:\Users\用户名\.codex\auth.json</code>）。
+      </div>
+      <div class="quick-path-box">
+        <span class="quick-path-tip">Windows 快速打开目录（按 Win+R 或在文件资源管理器地址栏粘贴）：</span>
+        <div class="quick-path-row">
+          <code class="quick-path-code">%USERPROFILE%\.codex</code>
+          <button class="quick-path-copy-btn" id="copyPathBtn" type="button" title="点击一键复制路径">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span id="copyPathBtnText">一键复制</span>
+          </button>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -1021,6 +1088,29 @@ if command -v codex >/dev/null 2>&1; then codex login status; fi`;
       setTimeout(() => { copyBtn.textContent = '复制命令'; }, 1500);
     }
   });
+  const copyPathBtn = document.getElementById('copyPathBtn');
+  const copyPathBtnText = document.getElementById('copyPathBtnText');
+  if (copyPathBtn) {
+    copyPathBtn.addEventListener('click', async () => {
+      const pathText = '%USERPROFILE%\\.codex';
+      try {
+        await navigator.clipboard.writeText(pathText);
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = pathText;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      copyPathBtn.classList.add('ok');
+      copyPathBtnText.textContent = '已复制';
+      setTimeout(() => {
+        copyPathBtn.classList.remove('ok');
+        copyPathBtnText.textContent = '一键复制';
+      }, 1500);
+    });
+  }
 })();
 </script>
 </body>
