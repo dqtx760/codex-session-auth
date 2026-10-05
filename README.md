@@ -9,7 +9,8 @@
 - **纯前端实现**：单文件 HTML，所有解析、生成均在浏览器本地完成，token 不会上传到任何服务器
 - **多平台命令**：自动生成 Windows PowerShell / Linux Bash / macOS Bash 三种平台的写入命令
 - **智能解析**：支持粘贴完整 Session JSON，也支持仅粘贴 `accessToken` 字符串
-- **自动提取 account_id**：从 JWT payload 中解析 `chatgpt_account_id`，无需手动填写
+- **自动构造 Synthetic id_token**：自动生成 Codex 规范所需的仿真 OIDC id_token，注入 `account_id`、`plan_type`、`email` 等 Claims
+- **自动填充 refresh_token**：提取 Session 中的 `sessionToken` 或使用安全占位符，避免 Codex CLI 报错 `stored credentials are incomplete`
 - **PowerShell 5.1 兼容**：使用 .NET API 强制写入无 BOM 的 UTF-8，避免 codex 报 `expected value at line 1 column 1` 错误
 
 ## 使用方法
@@ -57,10 +58,10 @@ http-server .
   "auth_mode": "chatgpt",
   "OPENAI_API_KEY": null,
   "tokens": {
-    "id_token": "<accessToken>",
+    "id_token": "<Synthetic OIDC id_token (包含 account_id, plan_type, email 等)>",
     "access_token": "<accessToken>",
-    "refresh_token": "",
-    "account_id": "<从 JWT 提取的 chatgpt_account_id>"
+    "refresh_token": "<sessionToken 或 placeholder>",
+    "account_id": "<从 Session 对象或 JWT 提取的 account_id>"
   },
   "last_refresh": "<当前时间 ISO 字符串>"
 }

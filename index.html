@@ -31,17 +31,144 @@
   .wrap {
     max-width: 880px;
     margin: 0 auto;
-    padding: 48px 24px 80px;
+    padding: 36px 24px 80px;
+  }
+  /* === Top Navbar === */
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(11, 13, 16, 0.78);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    width: 100%;
+    transition: border-color 0.2s ease;
+  }
+  .nav-container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .nav-brand:hover .nav-brand-name {
+    color: #fff;
+  }
+  .nav-brand-logo {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #1f2530, #13171f);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #10a37f;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  }
+  .nav-brand-name {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    color: var(--text);
+    transition: color 0.15s ease;
+  }
+  .nav-brand-sub {
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .nav-badge {
+    font-size: 11px;
+    padding: 1px 7px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 5px 8px;
+    border-radius: 6px;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+  .nav-link:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .nav-link-dimmed {
+    color: #8b95a3;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s ease;
+  }
+  .nav-link-dimmed:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+  .nav-icon-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 5px;
+    border-radius: 6px;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+  .nav-icon-link:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  @media (max-width: 600px) {
+    .nav-container {
+      padding: 0 16px;
+      height: 50px;
+    }
+    .nav-badge {
+      display: none;
+    }
+    .nav-actions {
+      gap: 8px;
+    }
+  }
+  header {
+    margin-bottom: 24px;
   }
   header h1 {
-    font-size: 28px;
-    margin: 0 0 8px;
-    letter-spacing: -0.5px;
-  }
-  header p {
+    font-size: 26px;
+    font-weight: 700;
     margin: 0;
-    color: var(--muted);
-    font-size: 14px;
+    letter-spacing: -0.4px;
+    color: var(--text);
   }
   .step {
     margin-top: 32px;
@@ -196,7 +323,8 @@
   }
   .err.show { display: block; }
   /* === Password Gate === */
-  body.gated .wrap {
+  body.gated .wrap,
+  body.gated .navbar {
     filter: blur(6px);
     pointer-events: none;
     user-select: none;
@@ -420,14 +548,37 @@
     </div>
   </div>
 </div>
+<nav class="navbar">
+  <div class="nav-container">
+    <a class="nav-brand" href="./">
+      <div class="nav-brand-logo">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+      </div>
+      <span class="nav-brand-name">Codex <span class="nav-brand-sub">Session Auth</span></span>
+      <span class="nav-badge">CLI Tool</span>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-link" href="https://codex.afione.com/" target="_blank" rel="noopener">
+        <span>插件版</span>
+      </a>
+      <a class="nav-link-dimmed" href="https://wzyp.cn/shop/ZBT3W1E1" target="_blank" rel="noopener" title="ChatGPT 账户代充">
+        <span>GPT代充</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.75"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
+      </a>
+      <a class="nav-icon-link" href="https://github.com/dqtx760" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      </a>
+    </div>
+  </div>
+</nav>
 
 <div class="wrap">
 
   <header>
     <h1>Codex 免验证码登录</h1>
-    <p>纯前端工具 · 通过 ChatGPT Session Token 配置 Codex CLI</p>
   </header>
-
   <!-- Step 1 -->
   <section class="step">
     <div class="step-head">
@@ -452,7 +603,7 @@
   <section class="step">
     <div class="step-head">
       <span class="step-num">2</span>
-      <span class="step-title">粘贴 Session JSON 或 Access Token</span>
+      <span class="step-title">粘贴Session JSON</span>
     </div>
     <textarea id="input" placeholder='粘贴整段 JSON,例如:&#10;{&#10;  "user": {...},&#10;  "accessToken": "eyJhbGciOiJSUzI1NiIs...",&#10;  "expires": "2026-...",&#10;  ...&#10;}&#10;&#10;或仅粘贴 accessToken 字符串。'></textarea>
     <div class="err" id="err"></div>
@@ -485,6 +636,7 @@
     <a class="btn-ghost" href="https://chatgpt.com" target="_blank" rel="noopener">🌐 ChatGPT 官网</a>
     <a class="btn-ghost" href="https://chatgpt.com/advanced-account-security" target="_blank" rel="noopener">⚙️ 高级账户设置</a>
     <a class="btn-ghost" href="https://github.com/dqtx760" target="_blank" rel="noopener">💻 GitHub 主页</a>
+    <a class="btn-ghost" href="https://codex.afione.com/" target="_blank" rel="noopener">🧩 插件版</a>
   </div>
 
   <footer>
@@ -572,7 +724,15 @@ if (localStorage.getItem('auth_ok') === '1') {
     err.classList.remove('show');
   }
 
-  // Base64URL decode (for JWT)
+  // Base64URL encode/decode
+  function b64urlEncode(obj) {
+    const str = typeof obj === 'string' ? obj : JSON.stringify(obj);
+    const base64 = btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) =>
+      String.fromCharCode('0x' + p1)
+    ));
+    return base64.replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+  }
+
   function b64urlDecode(str) {
     str = str.replace(/-/g, '+').replace(/_/g, '/');
     while (str.length % 4) str += '=';
@@ -588,8 +748,9 @@ if (localStorage.getItem('auth_ok') === '1') {
   }
 
   function parseJWT(token) {
+    if (typeof token !== 'string') return null;
     const parts = token.split('.');
-    if (parts.length !== 3) return null;
+    if (parts.length < 2) return null;
     try {
       return JSON.parse(b64urlDecode(parts[1]));
     } catch (e) {
@@ -597,46 +758,110 @@ if (localStorage.getItem('auth_ok') === '1') {
     }
   }
 
-  function extractToken(raw) {
-    const text = raw.trim();
-    if (!text) return null;
+  function buildFromSession(session, accessToken) {
+    const jwtPayload = parseJWT(accessToken) || {};
+    const authClaim = jwtPayload['https://api.openai.com/auth'] || {};
+    const profileClaim = jwtPayload['https://api.openai.com/profile'] || {};
 
-    // 尝试解析 JSON
-    if (text.startsWith('{')) {
-      try {
-        const obj = JSON.parse(text);
-        if (typeof obj.accessToken === 'string') return obj.accessToken;
-        if (obj.tokens && typeof obj.tokens.access_token === 'string') return obj.tokens.access_token;
-        if (typeof obj.access_token === 'string') return obj.access_token;
-        throw new Error('JSON 中未找到 accessToken 字段');
-      } catch (e) {
-        throw new Error('JSON 解析失败: ' + e.message);
-      }
+    // 优先从 session 对象获取，降级从 accessToken 的 JWT claims 中获取
+    const accountId = (session && session.account && session.account.id)
+      || authClaim.chatgpt_account_id
+      || authClaim.user_id
+      || '';
+
+    const email = (session && session.user && session.user.email)
+      || profileClaim.email
+      || jwtPayload.email
+      || '';
+
+    const planType = (session && session.account && session.account.planType)
+      || authClaim.chatgpt_plan_type
+      || 'free';
+
+    const userId = (session && session.user && session.user.id)
+      || authClaim.chatgpt_user_id
+      || authClaim.user_id
+      || jwtPayload.sub
+      || '';
+
+    const iat = Math.floor(Date.now() / 1000);
+    let exp;
+    if (session && session.expires) {
+      const t = Math.floor(new Date(session.expires).getTime() / 1000);
+      exp = isNaN(t) ? (iat + 30 * 24 * 3600) : t;
+    } else if (jwtPayload.exp) {
+      exp = jwtPayload.exp;
+    } else {
+      exp = iat + 30 * 24 * 3600;
     }
 
-    // 当作纯 token 字符串
-    if (text.split('.').length === 3) return text;
-    throw new Error('无法识别的输入。请粘贴 Session JSON 或 JWT 字符串。');
-  }
+    // 构建 Synthetic id_token (无签名 JWT，对齐 codex-auth-helper 规范)
+    const syntheticHeader = { alg: 'none', typ: 'JWT', cpa_synthetic: true };
+    const syntheticPayload = {
+      iat,
+      exp,
+      'https://api.openai.com/auth': {
+        chatgpt_account_id: accountId,
+        chatgpt_plan_type: planType,
+        chatgpt_user_id: userId,
+        user_id: userId
+      },
+      email
+    };
 
-  function buildAuthJson(accessToken) {
-    const payload = parseJWT(accessToken) || {};
-    const authClaim = payload['https://api.openai.com/auth'] || {};
-    const accountId = authClaim.chatgpt_account_id || authClaim.user_id || '';
+    const syntheticIdToken = `${b64urlEncode(syntheticHeader)}.${b64urlEncode(syntheticPayload)}.synthetic`;
+
+    // refresh_token 必须非空（Codex CLI 严格校验，为空时会报 credentials incomplete）
+    const refreshToken = (session && (session.sessionToken || session.session_token))
+      || 'placeholder';
 
     return {
       auth_mode: 'chatgpt',
       OPENAI_API_KEY: null,
       tokens: {
-        id_token: accessToken,
+        id_token: syntheticIdToken,
         access_token: accessToken,
-        refresh_token: '',
+        refresh_token: refreshToken,
         account_id: accountId
       },
       last_refresh: new Date().toISOString()
     };
   }
 
+  function parseInput(raw) {
+    const text = raw.trim();
+    if (!text) return null;
+
+    if (text.startsWith('{')) {
+      let obj;
+      try {
+        obj = JSON.parse(text);
+      } catch (e) {
+        throw new Error('JSON 解析失败: ' + e.message);
+      }
+
+      // 如果直接粘贴了已组装的 auth.json
+      if (obj.tokens && (obj.tokens.access_token || obj.tokens.accessToken)) {
+        const accToken = obj.tokens.access_token || obj.tokens.accessToken;
+        return buildFromSession(obj, accToken);
+      }
+
+      // 标准 Session JSON
+      let accToken = '';
+      if (typeof obj.accessToken === 'string') accToken = obj.accessToken;
+      else if (typeof obj.access_token === 'string') accToken = obj.access_token;
+      else throw new Error('JSON 中未找到 accessToken 字段，请粘贴完整的 ChatGPT Session JSON');
+
+      return buildFromSession(obj, accToken);
+    }
+
+    // 纯 JWT 字符串
+    if (text.split('.').length >= 2) {
+      return buildFromSession(null, text);
+    }
+
+    throw new Error('无法识别的输入。请粘贴 Session JSON 或 JWT 字符串。');
+  }
   function genPowerShell(authObj) {
     const json = JSON.stringify(authObj, null, 2);
     return `# Codex 凭证写入 (Windows PowerShell · 兼容 5.1 / 7+)
@@ -668,9 +893,9 @@ echo "[OK] 已写入 ~/.codex/auth.json"`;
       return;
     }
 
-    let token;
+    let authObj;
     try {
-      token = extractToken(raw);
+      authObj = parseInput(raw);
     } catch (e) {
       showErr(e.message);
       output.innerHTML = '<span class="empty" style="display:block">解析失败,请检查输入</span>';
@@ -678,13 +903,11 @@ echo "[OK] 已写入 ~/.codex/auth.json"`;
       return;
     }
 
-    if (!token) {
+    if (!authObj) {
       output.innerHTML = '<span class="empty" style="display:block">未找到 token</span>';
       currentCommand = '';
       return;
     }
-
-    const authObj = buildAuthJson(token);
 
     let cmd;
     if (currentPlatform === 'powershell') cmd = genPowerShell(authObj);
