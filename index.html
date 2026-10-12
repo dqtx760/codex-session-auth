@@ -640,6 +640,10 @@
         <span class="nav-status-dot"></span>
         <span>本地纯前端 · 数据不上传</span>
       </div>
+      <a class="nav-link-subtle" href="https://codex.afione.com/" target="_blank" rel="noopener">
+        <span>插件版</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.6"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
+      </a>
       <a class="nav-link-subtle" href="https://wzyp.cn/shop/ZBT3W1E1" target="_blank" rel="noopener">
         <span>GPT代充</span>
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.6"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
@@ -728,8 +732,7 @@
 // ⚠️ 请修改下面的值：
 // HASHED_PWD — 你的密码的 SHA-256 哈希值
 // 如何生成哈希：在浏览器控制台运行 sha256('你的密码')，或访问 https://emn178.github.io/online-tools/sha256.html
-// 示例密码 "codex2026" 的哈希: 3e69039eb2718d5b0706ead298a5d85873eb5af6d16dbb8d7205daf27502a91b
-const HASHED_PWD = '3e69039eb2718d5b0706ead298a5d85873eb5af6d16dbb8d7205daf27502a91b'; // 示例密码: codex2026。请修改为你自己的密码哈希
+const HASHED_PWD = '2747b7c718564ba5f066f0523b03e17f6a496b06851333d2d59ab6d863225848'; // 当前密码: 128。请修改为你自己的密码哈希
 
 async function sha256(msg) {
   const buffer = new TextEncoder().encode(msg);
